@@ -1,8 +1,10 @@
 from email.policy import default
+from os import abort
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from urllib.parse import quote
+from flask import jsonify
 
 app = Flask(__name__)
 # db
@@ -34,5 +36,24 @@ class Users(db.Model):
 def hello_world():
     return "<p>Hello, World!</p>"
 
-# DB_USERNAME=dero
-# DB_PASSWORD=Dextero@135
+
+@app.get('/users')
+def get_users():
+    users = Users.query.all()
+    return users
+    # return jsonify(users.to_json() for user in users)
+
+@app.get('/users/<int:user_id>')
+def get_user(user_id):
+    user = Users.query.get(user_id)
+    if user is None:
+        abort(404)
+    # return jsonify(user.to_json)
+    return user
+
+@app.post('/users')
+def post_users():
+    user = Users(name='Derrick', email='derrickmbugua50@gmail.com')
+    db.session.add(user)
+    db.session.commit()
+    return "success"
