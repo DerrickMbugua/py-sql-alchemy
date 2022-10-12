@@ -4,9 +4,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from urllib.parse import quote
-from flask import jsonify
+from flask import jsonify, make_response
+from flask_json import FlaskJSON, JsonError, json_response, as_json
+import json
+import json_fix
 
 app = Flask(__name__)
+#initialize 
+FlaskJSON(app)
 # db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://dero:%s@localhost/my_users'% quote('Dextero@135')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://users.db'
@@ -49,7 +54,10 @@ def get_user(user_id):
     if user is None:
         abort(404)
     # return jsonify(user.to_json)
-    return user
+    # return json_response(user)
+    # response = jsonify(user)
+    # return json.dumps(user)
+    # print(user)
 
 @app.post('/users')
 def post_users():
@@ -57,3 +65,10 @@ def post_users():
     db.session.add(user)
     db.session.commit()
     return "success"
+
+@app.route('/us/<int:id>', methods=['PUT'])
+def update_post(id):
+    user = Users.query.get(id)
+    user.name = "Mwema"
+    db.session.commit()
+    return "sucess"
